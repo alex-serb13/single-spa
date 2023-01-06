@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { createStyles, Header, Container, Group, Title } from "@mantine/core";
 import { navigateToUrl } from "single-spa";
 import { UserButton } from "./UserButton";
@@ -59,18 +59,16 @@ const useStyles = createStyles((theme) => ({
 
 const Link = (link) => {
   const { classes, cx } = useStyles();
+  const { pathname } = useLocation();
 
   return (
     <a
       key={link.label}
       href={link.link}
       className={cx(classes.link, {
-        [classes.linkActive]: window.location.pathname === link.link,
+        [classes.linkActive]: pathname === link.link,
       })}
       onClick={(event) => {
-        event.preventDefault();
-        link.setActive(link.link);
-        close();
         link.onClick(event);
       }}
     >
@@ -81,11 +79,7 @@ const Link = (link) => {
 
 export function Navigation() {
   const { isAuthenticated, signOut } = useStore();
-  const { classes, cx } = useStyles();
-  const [active, setActive] = useState("/");
-  useEffect(() => {
-    console.log(location.pathname);
-  }, [location]);
+  const { classes } = useStyles();
 
   return (
     <Header height={HEADER_HEIGHT} className={classes.root}>
@@ -106,16 +100,8 @@ export function Navigation() {
             <UserButton navigateToUrl={navigateToUrl} signOut={signOut} />
           ) : (
             <>
+              <Link link="/auth" label="Sign In" onClick={navigateToUrl} />
               <Link
-                active={active}
-                setActive={setActive}
-                link="/auth"
-                label="Sign In"
-                onClick={navigateToUrl}
-              />
-              <Link
-                active={active}
-                setActive={setActive}
                 link="/auth/signup"
                 label="Sign Up"
                 onClick={navigateToUrl}
